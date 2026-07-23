@@ -1,0 +1,95 @@
+[package]
+name = "silosuite-crypto"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Master-key flow, AEAD, KDF, recovery, and asymmetric primitives for SiloSuite. Targets both native and wasm32-unknown-unknown."
+repository = "https://github.com/immunity-uneven-daybreak/silosuite-crypto"
+rust-version = "1.78"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Symmetric AEAD. We use the XChaCha20-Poly1305-IETF construction
+# (192-bit nonce variant) -- the standing primitive across the
+# whole stack. `getrandom` is required for `aead::OsRng` and
+# `AeadCore::generate_nonce`. The aead crate gates the OsRng
+# re-export on `getrandom`, which transitively enables `rand_core`
+# for us.
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc", "getrandom"] }
+
+# KDFs
+argon2 = { version = "0.5", default-features = false, features = ["alloc", "password-hash"] }
+hkdf = { version = "0.12", default-features = false }
+sha2 = { version = "0.10", default-features = false }
+
+# Asymmetric — X25519 sealed boxes + Ed25519 signatures
+x25519-dalek = { version = "2.0", default-features = false, features = ["static_secrets", "zeroize"] }
+ed25519-dalek = { version = "2.1", default-features = false, features = ["zeroize", "rand_core"] }
+# Asymmetric -- X25519 sealed boxes (XChaCha20-Poly1305-IETF) +
+# Ed25519 signatures. We enable the `chacha20` feature (ChaChaBox)
+# and NOT `salsa20` (SalsaBox / XSalsa20-Poly1305) so the asymmetric
+# AEAD matches the symmetric one -- single XChaCha20 stream cipher
+# across the whole stack. `getrandom` exposes the OsRng re-export
+# under `crypto_box::aead::` and transitively enables `rand_core`.
+crypto_box = { version = "0.9", default-features = false, features = ["alloc", "chacha20", "getrandom"] }
+
+# BIP-39 recovery phrases
+bip39 = { version = "2.0", default-features = false }
+
+# Random source. The browser wiring (getrandom's `js` feature) lives
+# in the wasm32 target table below so native builds don't carry it.
+getrandom = "0.2"
+rand_core = { version = "0.6", features = ["getrandom"] }
+
+# Constant-time comparisons
+subtle = { version = "2.5", default-features = false }
+
+# Memory zeroization
+zeroize = { version = "1.7", features = ["zeroize_derive"] }
+
+# Heapless containers (for no_std compatibility and predictable sizes)
+heapless = { version = "0.8", features = ["serde"] }
+
+# Serialization for envelope format
+serde = { version = "1", features = ["derive"], default-features = false }
+serde_json = { version = "1", default-features = false, features = ["alloc"] }
+
+# Error handling
+thiserror = "1.0"
+
+# WASM-only deps
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# getrandom's `js` feature routes OsRng through the browser's
+# crypto.getRandomValues; wasm-only so native builds skip the JS shim.
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+serde-wasm-bindgen = "0.6"
+console_error_panic_hook = "0.1"
+# Zeroizing global allocator for the WASM build (see src/zeroizing_alloc.rs).
+# We wrap dlmalloc rather than re-implementing allocator logic.
+dlmalloc = { version = "0.2", features = ["global"] }
+
+[dev-dependencies]
+hex = "0.4"
+proptest = "1.4"
+
+[features]
+default = ["std"]
+std = []
+
+[package.metadata.wasm-pack.profile.release]
+# Enable modern wasm features that rustc emits by default (since ~Rust 1.65).
+# Without these flags, the binaryen build wasm-pack downloads rejects the
+# wasm with "Bulk memory operations require bulk memory" and similar.
+wasm-opt = [
+    "-O",
+    "--enable-bulk-memory",
+    "--enable-nontrapping-float-to-int",
+    "--enable-sign-ext",
+    "--enable-mutable-globals",
+    "--enable-reference-types",
+    "--enable-multivalue",
+]
