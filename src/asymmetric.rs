@@ -5,19 +5,22 @@
 //!   a known recipient public key).
 //! - **Ed25519** for signatures.
 //!
-//! Both come from the dalek-cryptography crates, which are widely used in
-//! security-critical projects including Signal and Tor.
+//! Ed25519 signatures come from ed25519-dalek. X25519 key generation and
+//! sealed boxes go through `crypto_box`, a `RustCrypto` crate whose curve
+//! arithmetic is dalek-cryptography's curve25519-dalek. Both dalek crates
+//! are widely used in security-critical projects, including Signal and
+//! Tor.
 
 use alloc::vec::Vec;
 // Migrating from XSalsa20-Poly1305 (SalsaBox) to XChaCha20-Poly1305-IETF
 // (ChaChaBox) to match the standing primitive declared.
-// Both are 256-bit-key authenticated encryption with 192-bit nonces from
-// RustCrypto's stack; the change unifies the symmetric and
-// asymmetric stream cipher to XChaCha20 and picks up the libsodium-compat
-// fix from crypto_box 0.9.0. The wire format is NOT interoperable with
-// either NaCl or any prior tagged release of this crate that may have
-// used SalsaBox; this is a fresh primitive choice with no
-// existing ciphertexts to migrate.
+// Both are 256-bit-key authenticated encryption with 192-bit nonces
+// from RustCrypto's stack; the change unifies the symmetric and
+// asymmetric stream cipher to XChaCha20 and picks up the
+// libsodium-compat fix from crypto_box 0.9.0. The wire format is NOT
+// interoperable with either NaCl or any prior tagged release of this
+// crate that may have used SalsaBox; this is a fresh primitive choice
+// with no existing ciphertexts to migrate.
 //
 // SECURITY: Both XSalsa20-Poly1305 and XChaCha20-Poly1305-IETF are
 // 256-bit-key, 192-bit-nonce authenticated encryption with AEAD
@@ -64,7 +67,7 @@ pub fn generate_x25519_keypair() -> CryptoResult<([u8; X25519_KEY_LEN], [u8; X25
 
 /// Anonymously encrypt a message to a recipient's X25519 public key.
 ///
-/// This is the `NaCl` `crypto_box_seal` construction: the sender generates an
+/// This is libsodium's `crypto_box_seal` construction: the sender generates an
 /// ephemeral keypair, performs a key exchange, and discards their secret.
 /// Recipient can decrypt; sender identity is unrecoverable.
 ///

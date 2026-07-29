@@ -316,8 +316,9 @@ pub fn rewrap_master_key(
 /// host-testable. The previous inline JSON used camelCase keys and omitted
 /// `auth_key` entirely, so the recovery-initiate body deserialized to
 /// `{email}` only and the server rejected it.
-// Only called from the wasm bindings, which are cfg-gated to wasm32, so
-// host builds see no caller. Covered by the contract test below.
+// Only called from the wasm bindings, which are cfg-gated to wasm32,
+// so non-test host builds see no caller. Covered by the contract test
+// below.
 #[cfg_attr(not(target_arch = "wasm32"), allow(dead_code))]
 pub(crate) fn rewrap_bundle_json(
     auth_key: &[u8],

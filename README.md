@@ -93,7 +93,7 @@ await init(); // initialize the WASM module
 | Symmetric AEAD        | XChaCha20-Poly1305 (24-byte nonce) | `chacha20poly1305`        |
 | KDF (password)        | Argon2id (m=64MB, t=2, p=1 floor)  | `argon2`                  |
 | KDF (subkey deriv.)   | HKDF-SHA256                        | `hkdf` + `sha2`           |
-| Asymmetric (DH)       | X25519                             | `x25519-dalek`            |
+| Asymmetric (DH)       | X25519                             | `crypto_box` (`curve25519-dalek`) |
 | Sealed box            | X25519 + XChaCha20-Poly1305 (ChaChaBox) | `crypto_box`         |
 | Signatures            | Ed25519                            | `ed25519-dalek`           |
 | Recovery phrases      | BIP-39 (24 words / 256-bit ent.)   | `bip39`                   |

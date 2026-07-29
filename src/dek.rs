@@ -8,8 +8,8 @@
 //! When a page is published, a separate Publish-Public-Key (PPK) is
 //! generated. The published payload is encrypted with PPK; PPK is stored
 //! alongside the page (server-readable) so the rendering service can decrypt.
-//! Unpublishing a page = `NULLing` the stored publish key = crypto-shredding the
-//! published copy.
+//! Unpublishing a page sets the stored publish key to NULL, crypto-shredding
+//! the published copy.
 
 use alloc::vec::Vec;
 

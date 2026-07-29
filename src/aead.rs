@@ -104,6 +104,7 @@ fn unwrap_v1(envelope: &[u8], key: &[u8], aad: &[u8]) -> CryptoResult<Vec<u8>> {
 /// Returns the algorithm version of the supplied envelope.
 ///
 /// # Errors
+///
 /// Returns [`CryptoError::CiphertextTooShort`] if the envelope is too short
 /// to contain a version prefix.
 pub fn envelope_version(envelope: &[u8]) -> CryptoResult<u16> {

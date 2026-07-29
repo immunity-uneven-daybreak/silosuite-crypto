@@ -1,0 +1,81 @@
+{
+    "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+    "version": "v1.1.0",
+    "entity": {
+        "type": "individual",
+        "role": "owner",
+        "name": "Trevor Gutierrez",
+        "email": "trevor.gutierrez@atomicmail.io",
+        "phone": "",
+        "description": "Independent software developer in Finland and sole author of silosuite-crypto, a small, misuse-resistant end-to-end-encryption library (Rust, compiled to WebAssembly) published under Apache-2.0. I build privacy-respecting consumer tools where the privacy claim is enforced by architecture rather than policy: user data is encrypted client-side and the operator holds only ciphertext. The funding solicited here goes to the one thing a small cryptography library most needs and can least afford: an independent external security review of the cryptographic core and its WebAssembly/JavaScript boundary, plus the open-source engineering to remediate findings and keep the library a clean, reusable public building block.",
+        "webpageUrl": {
+            "url": "https://github.com/immunity-uneven-daybreak",
+            "wellKnown": ""
+        }
+    },
+    "projects": [{
+        "guid": "silosuite-crypto",
+        "name": "silosuite-crypto",
+        "description": "A small, standalone end-to-end-encryption library in Rust, compiled to WebAssembly so any web application can encrypt user content client-side without trusting the server. In roughly 2,300 lines it composes established, widely-reviewed open primitives - XChaCha20-Poly1305-IETF authenticated encryption, Argon2id password-based key derivation, HKDF-SHA256, X25519 key agreement and sealed boxes, Ed25519 signatures, and BIP-39 recovery phrases - drawn from the RustCrypto, dalek-cryptography and rust-bitcoin projects. It implements no primitives of its own; its contribution is correct composition, a misuse-resistant API, versioned ciphertext envelopes, memory zeroization, and a single Rust implementation shared by server and browser. Published under Apache-2.0 with continuous integration and public test vectors. The library is code-complete and pre-launch; an independent cryptographic audit and a WASM/JS-boundary application-security review are the funded goals, with the reports to be published in full.",
+        "webpageUrl": {
+            "url": "https://github.com/immunity-uneven-daybreak/silosuite-crypto",
+            "wellKnown": ""
+        },
+        "repositoryUrl": {
+            "url": "https://github.com/immunity-uneven-daybreak/silosuite-crypto",
+            "wellKnown": ""
+        },
+        "licenses": ["spdx:Apache-2.0"],
+        "tags": ["encryption", "end-to-end-encryption", "cryptography", "privacy", "security", "webassembly", "rust", "browser", "library"]
+    }],
+    "funding": {
+        "channels": [{
+            "guid": "bank",
+            "type": "bank",
+            "address": "",
+            "description": "Direct SEPA bank transfer (Finland). Please e-mail for account details."
+        }],
+        "plans": [
+            {
+                "guid": "crypto-audit",
+                "status": "active",
+                "name": "Independent cryptographic audit",
+                "description": "Fixed-scope external audit of the cryptographic core by a specialist firm: construction and composition of the primitives, key management and lifecycle, and API misuse-resistance. The full report will be published. Amount is a market-sized estimate for a library of this size and scope.",
+                "amount": 14000,
+                "currency": "EUR",
+                "frequency": "one-time",
+                "channels": ["bank"]
+            },
+            {
+                "guid": "boundary-review",
+                "status": "active",
+                "name": "WASM/JS-boundary application-security review",
+                "description": "Separable external review of the WebAssembly/JavaScript boundary: preservation of constant-time behaviour and memory hygiene across Rust to WASM to JS, and absence of boundary-level leaks or misuse hazards. Report published in full.",
+                "amount": 14000,
+                "currency": "EUR",
+                "frequency": "one-time",
+                "channels": ["bank"]
+            },
+            {
+                "guid": "remediation-release",
+                "status": "active",
+                "name": "Remediation, documentation and release engineering",
+                "description": "Triage and remediation of audit findings with auditor re-test, published test vectors, documentation and integration examples, and packaging for crates.io and npm, billed at a cost-recovery rate.",
+                "amount": 6300,
+                "currency": "EUR",
+                "frequency": "one-time",
+                "channels": ["bank"]
+            },
+            {
+                "guid": "goodwill",
+                "status": "active",
+                "name": "Goodwill plan",
+                "description": "Any amount toward the audit and open-source engineering above.",
+                "amount": 0,
+                "currency": "EUR",
+                "frequency": "one-time",
+                "channels": ["bank"]
+            }
+        ]
+    }
+}
