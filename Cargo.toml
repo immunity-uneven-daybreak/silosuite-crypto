@@ -24,9 +24,6 @@ argon2 = { version = "0.5", default-features = false, features = ["alloc", "pass
 hkdf = { version = "0.12", default-features = false }
 sha2 = { version = "0.10", default-features = false }
 
-# Asymmetric — X25519 sealed boxes + Ed25519 signatures
-x25519-dalek = { version = "2.0", default-features = false, features = ["static_secrets", "zeroize"] }
-ed25519-dalek = { version = "2.1", default-features = false, features = ["zeroize", "rand_core"] }
 # Asymmetric -- X25519 sealed boxes (XChaCha20-Poly1305-IETF) +
 # Ed25519 signatures. We enable the `chacha20` feature (ChaChaBox)
 # and NOT `salsa20` (SalsaBox / XSalsa20-Poly1305) so the asymmetric
@@ -34,6 +31,7 @@ ed25519-dalek = { version = "2.1", default-features = false, features = ["zeroiz
 # across the whole stack. `getrandom` exposes the OsRng re-export
 # under `crypto_box::aead::` and transitively enables `rand_core`.
 crypto_box = { version = "0.9", default-features = false, features = ["alloc", "chacha20", "getrandom"] }
+ed25519-dalek = { version = "2.1", default-features = false, features = ["zeroize", "rand_core"] }
 
 # BIP-39 recovery phrases
 bip39 = { version = "2.0", default-features = false }
