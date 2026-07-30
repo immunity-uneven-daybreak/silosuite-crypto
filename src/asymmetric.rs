@@ -85,13 +85,13 @@ pub fn seal_to_pubkey(
     let ephemeral = BoxSec::generate(&mut BoxOsRng);
     let ephemeral_pub: [u8; 32] = ephemeral.public_key().to_bytes();
 
-    // NOTE: this is NOT byte-for-byte NaCl `crypto_box_seal`. NaCl's
-    // seal derives the nonce as BLAKE2b(eph_pub || recipient_pub),
+    // NOTE: this is NOT byte-for-byte libsodium `crypto_box_seal`.
+    // Libsodium's seal derives the nonce as BLAKE2b(eph_pub || recipient_pub),
     // making the nonce reconstructable on the recipient side from
     // data already in the wire format + their own pubkey. We use a
     // random nonce shipped on the wire instead. The semantics
     // (anonymity, recipient-only decryption) are equivalent; the
-    // wire format is NOT interoperable with NaCl tooling. Don't
+    // wire format is NOT interoperable with libsodium tooling. Don't
     // rename to `nacl_seal` or `crypto_box_seal` to avoid confusion.
     let nonce = ChaChaBox::generate_nonce(&mut BoxOsRng);
     let chacha_box = ChaChaBox::new(&recipient, &ephemeral);
