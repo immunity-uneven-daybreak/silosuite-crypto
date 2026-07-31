@@ -94,7 +94,7 @@ impl MasterKey {
 /// `auth_key` is a live credential. It is derived from the user's master
 /// password via Argon2id under the `silosuite-v1-auth-key` domain separator,
 /// and a server is expected to store only a VERIFIER of it (see this module's
-/// header), so the AuthKey is the secret a client PRESENTS to prove password
+/// header), so the `AuthKey` is the secret a client PRESENTS to prove password
 /// knowledge -- not something the server already holds. A derived `Debug`
 /// printed it verbatim anywhere this struct met `{:?}`.
 ///
@@ -599,9 +599,9 @@ mod debug_redaction_tests {
     // `std` feature is on, and the assertion must hold in either build.
     use alloc::format;
 
-    /// `{:?}` on a SignupBundle must not emit the AuthKey.
+    /// `{:?}` on a `SignupBundle` must not emit the `AuthKey`.
     ///
-    /// AuthKey is a live credential -- derived from the master password under
+    /// `AuthKey` is a live credential -- derived from the master password under
     /// the `silosuite-v1-auth-key` domain separator, with the server storing
     /// only `argon2id(authKey)` as a verifier (see this module's header). So it
     /// is the secret a client PRESENTS, and a derived Debug printed it verbatim.
