@@ -89,7 +89,18 @@ impl MasterKey {
 // -------------------------------------------------------------------------
 
 /// The complete bundle a client sends to the server at signup.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+///
+/// SECURITY: `Debug` is hand-written below rather than derived, because
+/// `auth_key` is a live credential. It is derived from the user's master
+/// password via Argon2id under the `silosuite-v1-auth-key` domain separator,
+/// and a server is expected to store only a VERIFIER of it (see this module's
+/// header), so the AuthKey is the secret a client PRESENTS to prove password
+/// knowledge -- not something the server already holds. A derived `Debug`
+/// printed it verbatim anywhere this struct met `{:?}`.
+///
+/// `Clone`, `Serialize` and `Deserialize` are untouched: this type still goes
+/// over the wire exactly as before. Only its human-facing formatting changed.
+#[derive(Clone, Serialize, Deserialize)]
 pub struct SignupBundle {
     /// `AuthKey`, base64-encoded (32 bytes).
     pub auth_key: alloc::string::String,
@@ -114,6 +125,47 @@ pub struct SignupBundle {
     /// Concatenated private keys, encrypted under MK.
     pub wrapped_private_keys: alloc::vec::Vec<u8>,
 }
+
+// SECURITY: mixed type -- one live credential, several non-secret or
+// non-sensitive fields -- so the field list is explicit rather than opaque.
+//
+// `argon_params` stays legible: cost parameters are exactly what you want in a
+// debug log when a derivation misbehaves, and they are not secret. The wrapped
+// blobs are ciphertext and so not a leak, but there is no reason to print them,
+// and a shorter output is a more readable one. The public keys are public by
+// definition and kept.
+//
+// The failure mode this shape gives us: a field added to SignupBundle later and
+// NOT added here simply does not appear. Omission is silent but SAFE -- the
+// derive had the opposite property, printing anything new automatically.
+impl core::fmt::Debug for SignupBundle {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("SignupBundle")
+            // The credential. Fixed placeholder, no length and no prefix: a
+            // partial mask narrows the search space for something an attacker
+            // would otherwise have to derive from the master password.
+            .field("auth_key", &"<redacted>")
+            .field("argon_params", &self.argon_params)
+            // Ciphertext -- withheld for brevity, not for secrecy.
+            .field("wrapped_mk", &"<omitted: ciphertext>")
+            .field(
+                "wrapped_mk_recovery",
+                &self.wrapped_mk_recovery.as_ref().map(|_| "<omitted: ciphertext>"),
+            )
+            // A per-user KDF salt. Not secret (it ships to the client and is
+            // stored server-side), but it identifies the account, so there is
+            // nothing to gain by printing it.
+            .field(
+                "recovery_salt_hex",
+                &self.recovery_salt_hex.as_ref().map(|_| "<omitted>"),
+            )
+            .field("pubkey_x25519", &self.pubkey_x25519)
+            .field("pubkey_ed25519", &self.pubkey_ed25519)
+            .field("wrapped_private_keys", &"<omitted: ciphertext>")
+            .finish()
+    }
+}
+
 
 /// Result of [`create_master_key_bundle`] -- the bundle to send to the
 /// server, plus (optionally) the recovery phrase to display ONCE to the
@@ -537,5 +589,51 @@ mod tests {
         // Zeroizing doesn't implement PartialEq for the wrapped type;
         // dereference to the inner [u8; 32] for the comparison.
         assert_ne!(*kek, *auth);
+    }
+}
+
+#[cfg(test)]
+mod debug_redaction_tests {
+    use super::*;
+    // `format!` via alloc rather than std: this crate is `no_std` unless the
+    // `std` feature is on, and the assertion must hold in either build.
+    use alloc::format;
+
+    /// `{:?}` on a SignupBundle must not emit the AuthKey.
+    ///
+    /// AuthKey is a live credential -- derived from the master password under
+    /// the `silosuite-v1-auth-key` domain separator, with the server storing
+    /// only `argon2id(authKey)` as a verifier (see this module's header). So it
+    /// is the secret a client PRESENTS, and a derived Debug printed it verbatim.
+    ///
+    /// This asserts the ABSENCE of the key material, never the presence of a
+    /// placeholder: a Debug emitting BOTH the placeholder and the value would
+    /// satisfy a "contains <redacted>" check while leaking exactly as before.
+    #[test]
+    fn signup_bundle_debug_redacts_auth_key() {
+        let created = create_master_key_bundle(b"correct horse battery staple", true).unwrap();
+        let bundle = created.bundle;
+
+        // Sanity: the value we are about to look for is actually in the struct,
+        // otherwise the assertion below would pass vacuously.
+        assert!(
+            !bundle.auth_key.is_empty(),
+            "auth_key is empty -- the redaction assertion would prove nothing"
+        );
+
+        let rendered = format!("{bundle:?}");
+        assert!(
+            !rendered.contains(bundle.auth_key.as_str()),
+            "SignupBundle Debug leaked the AuthKey (a live credential): {rendered}"
+        );
+
+        // Redaction that destroys diagnosability gets deleted by the next person
+        // under pressure, so pin the half that stays useful: the Argon2 cost
+        // parameters are non-secret and are what you want when a derivation
+        // misbehaves.
+        assert!(
+            rendered.contains("argon_params"),
+            "SignupBundle Debug should keep argon_params legible: {rendered}"
+        );
     }
 }
