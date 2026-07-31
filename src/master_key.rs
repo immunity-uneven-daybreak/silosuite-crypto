@@ -150,7 +150,10 @@ impl core::fmt::Debug for SignupBundle {
             .field("wrapped_mk", &"<omitted: ciphertext>")
             .field(
                 "wrapped_mk_recovery",
-                &self.wrapped_mk_recovery.as_ref().map(|_| "<omitted: ciphertext>"),
+                &self
+                    .wrapped_mk_recovery
+                    .as_ref()
+                    .map(|_| "<omitted: ciphertext>"),
             )
             // A per-user KDF salt. Not secret (it ships to the client and is
             // stored server-side), but it identifies the account, so there is
@@ -165,7 +168,6 @@ impl core::fmt::Debug for SignupBundle {
             .finish()
     }
 }
-
 
 /// Result of [`create_master_key_bundle`] -- the bundle to send to the
 /// server, plus (optionally) the recovery phrase to display ONCE to the
