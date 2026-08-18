@@ -7,7 +7,7 @@
         "name": "Trevor Gutierrez",
         "email": "trevor.gutierrez@atomicmail.io",
         "phone": "",
-        "description": "Independent software developer in Finland and sole author of silosuite-crypto, a small, misuse-resistant end-to-end-encryption library (Rust, compiled to WebAssembly) published under Apache-2.0. I build privacy-respecting consumer tools where the privacy claim is enforced by architecture rather than policy: user data is encrypted client-side and the operator holds only ciphertext. The funding solicited here goes to the one thing a small cryptography library most needs and can least afford: an independent external security review of the cryptographic core and its WebAssembly/JavaScript boundary, plus the open-source engineering to remediate findings and keep the library a clean, reusable public building block.",
+        "description": "Independent software developer in Finland and sole author of silosuite-crypto, a small, misuse-resistant end-to-end-encryption library (Rust, compiled to WebAssembly) published under Apache-2.0. I build privacy-respecting consumer tools where the privacy claim is enforced by architecture rather than policy: drafts and audience contact data are encrypted in the user's browser, under keys the server never holds. The funding solicited here goes to the one thing a small cryptography library most needs and can least afford: an independent external security review of the cryptographic core and its WebAssembly/JavaScript boundary, plus the open-source engineering to remediate findings and keep the library a clean, reusable public building block.",
         "webpageUrl": {
             "url": "https://github.com/immunity-uneven-daybreak",
             "wellKnown": ""
