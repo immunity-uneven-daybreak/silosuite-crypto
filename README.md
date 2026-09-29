@@ -3,10 +3,10 @@
 > Cryptographic primitives for SiloSuite. A single Rust implementation used
 > natively on the server and in the browser via WebAssembly.
 
-A small, misuse-resistant end-to-end-encryption API: authenticated encryption
-with versioned envelopes, password-based key derivation, key wrapping, sealed
-boxes, signatures, and BIP-39 recovery phrases. It composes established
-primitives; it implements none of its own.
+A small end-to-end-encryption API, designed to be hard to misuse:
+authenticated encryption with versioned envelopes, password-based key
+derivation, key wrapping, sealed boxes, signatures, and BIP-39 recovery
+phrases. It composes established primitives; it implements none of its own.
 
 ## Install
 
